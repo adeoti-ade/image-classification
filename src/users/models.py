@@ -5,19 +5,18 @@ from django.contrib.auth.models import (
     BaseUserManager, AbstractBaseUser
 )
 
-from safedelete.models import SafeDeleteModel
-from safedelete.models import SOFT_DELETE_CASCADE
+from utils.models import BaseModel
 
 from .managers import UserManager
 
 
-class User(AbstractBaseUser, SafeDeleteModel):
+class User(AbstractBaseUser, BaseModel):
     """
-    This is a custom user model that inherits the abstract base user and safe delete mode
+    This is a custom user model that inherits the abstract base user and base model
     """
-    _safedelete_policy = SOFT_DELETE_CASCADE
+    # _safedelete_policy = SOFT_DELETE_CASCADE
 
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    # id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     email = models.EmailField(
         verbose_name='email address',
         max_length=255,
@@ -31,13 +30,17 @@ class User(AbstractBaseUser, SafeDeleteModel):
     # notice the absence of a "Password field", that is built in.
     first_name = models.CharField(max_length=150, blank=False, null=False)
     last_name = models.CharField(max_length=150, blank=False, null=False)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    username = models.CharField(max_length=150, blank=False, null=True, unique=True)
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = []  # Email & Password are required by default.python manage.py migrate
+    REQUIRED_FIELDS = [username, first_name, last_name]  # Email & Password are required by default.python manage.py
+    # migrate
 
     objects = UserManager()
+
+    class Meta:
+        ordering = ("created", )
+        unique_together = ("email", "username", )
 
     @property
     def get_full_name(self):
@@ -76,3 +79,13 @@ class User(AbstractBaseUser, SafeDeleteModel):
     def is_active(self):
         """Is the user active?"""
         return self.active
+
+
+class Token(BaseModel):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="token")
+    otp = models.CharField(max_length=10, blank=True)
+    expires = models.DateTimeField()
+
+    class Meta:
+        ordering = ("-created",)

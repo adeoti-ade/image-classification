@@ -1,5 +1,7 @@
 from django.urls import path, include
 
+app_name = "users"
+
 urlpatterns = [
-    path('dj-rest-auth/', include('dj_rest_auth.urls'))
+    path('api/', include("users.api.urls"))
 ]

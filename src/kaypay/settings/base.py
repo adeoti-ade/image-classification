@@ -26,7 +26,8 @@ DJANGO_APPS = [
 ]
 
 KAYPAY_APPS = [
-    'users'
+    'users',
+    'utils'
 ]
 
 THIRD_PARTIES = [
@@ -47,6 +48,7 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'kaypay.urls'
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # During development only
 
 TEMPLATES = [
     {

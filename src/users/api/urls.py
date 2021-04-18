@@ -1,9 +1,10 @@
-from django.contrib import admin
 from django.urls import path, include
+from . import views
 
 
-app_name = "users"
+app_name = "api"
 
 urlpatterns = [
-    path('/', include("users.api.urls"))
+    path("create", views.UserCreateAPIView.as_view()),
+    path("login", views.UserLoginViewJWT.as_view())
 ]
