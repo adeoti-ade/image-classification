@@ -1,16 +1,18 @@
 from users.models import User, Token
 
-from .serializers import (UserSerializer, )
+from .serializers import (UserSerializer, TokenSerializer)
 from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework import status, permissions
 from rest_framework_simplejwt import views as jwt_views
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework import serializers
+
 
 from django.db import transaction
 
-from users.services.token import  TokenGenerator
 from utils.helpers import send_mail
+from users.services.token import generate_token, verify_token
 
 
 class UserLoginViewJWT(jwt_views.TokenObtainPairView):
@@ -37,8 +39,7 @@ class UserCreateAPIView(generics.CreateAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = self.perform_create(serializer)
-        otp_generator = TokenGenerator()
-        token, expires_at = otp_generator.generate_otp(seconds=3600, user=user)
+        token, expires_at = generate_token(seconds=3600, user=user)
         headers = self.get_success_headers(serializer.data)
         mail_subject = 'Activate your Kaypay ccount.'
         context = {
@@ -70,3 +71,24 @@ class UserCreateAPIView(generics.CreateAPIView):
             'refresh': str(refresh),
             'access': str(refresh.access_token),
         }
+
+
+class EmailVerificationView(generics.APIView):
+    serializer_class = TokenSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        token = request.data.get("token")
+        token, token_status = verify_token(token=token)
+        if token_status is False:
+            raise serializers.ValidationError(detail={
+                "otp": "expired token"
+            })
+        if token_status is True:
+            user = token.user
+            user.active = True
+            user.save()
+
+            return Response(UserSerializer(user).data)
+
