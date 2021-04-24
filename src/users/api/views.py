@@ -12,7 +12,7 @@ from rest_framework import serializers
 from django.db import transaction
 
 from utils.helpers import send_mail
-from users.services.token import generate_token, verify_token
+from users.services.token import TokenService
 
 
 class UserLoginViewJWT(jwt_views.TokenObtainPairView):
@@ -39,7 +39,8 @@ class UserCreateAPIView(generics.CreateAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = self.perform_create(serializer)
-        token, expires_at = generate_token(seconds=3600, user=user)
+        token_service = TokenService()
+        token, expires_at = token_service.generate_token(seconds=3600, user=user)
         headers = self.get_success_headers(serializer.data)
         mail_subject = 'Activate your Kaypay ccount.'
         context = {
@@ -73,22 +74,18 @@ class UserCreateAPIView(generics.CreateAPIView):
         }
 
 
-class EmailVerificationView(generics.APIView):
+class EmailVerificationView(generics.GenericAPIView):
     serializer_class = TokenSerializer
 
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         token = request.data.get("token")
-        token, token_status = verify_token(token=token)
-        if token_status is False:
-            raise serializers.ValidationError(detail={
-                "otp": "expired token"
-            })
-        if token_status is True:
-            user = token.user
-            user.active = True
-            user.save()
+        token_service = TokenService(token=token)
+        token = token_service.verify_token()
+        user = token.user
+        user.active = True
+        user.save()
 
-            return Response(UserSerializer(user).data)
+        return Response(UserSerializer(user).data)
 

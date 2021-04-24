@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from users.models import User, Token
-from users.services.token import TokenGenerator
+from users.services.token import TokenService
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -20,7 +20,7 @@ class UserSerializer(serializers.ModelSerializer):
 class TokenSerializer(serializers.ModelSerializer):
     class Meta:
         model = Token
-        fields = "__all__"
+        fields = ["token"]
 
     def validate(self):
         request = self.context["request"]
