@@ -39,9 +39,9 @@ class UserCreateAPIView(generics.CreateAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
         token_service = TokenService()
         token, expires_at = token_service.generate_token(seconds=3600, user=user)
-        headers = self.get_success_headers(serializer.data)
         mail_subject = 'Activate your Kaypay ccount.'
         context = {
             'user': user,

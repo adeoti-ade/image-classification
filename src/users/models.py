@@ -10,7 +10,6 @@ from utils.models import BaseModel
 from .managers import UserManager
 
 
-
 class User(AbstractBaseUser, BaseModel):
     """
     This is a custom user model that inherits the abstract base user and base model
@@ -34,14 +33,14 @@ class User(AbstractBaseUser, BaseModel):
     username = models.CharField(max_length=150, blank=False, null=True, unique=True)
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = [username, first_name, last_name]  # Email & Password are required by default.python manage.py
+    REQUIRED_FIELDS = []  # Email & Password are required by default.python manage.py
     # migrate
 
     objects = UserManager()
 
     class Meta:
-        ordering = ("created", )
-        unique_together = ("email", "username", )
+        ordering = ("created",)
+        unique_together = ("email", "username",)
 
     @property
     def get_full_name(self):
@@ -91,6 +90,3 @@ class Token(BaseModel):
 
     class Meta:
         ordering = ("-created",)
-
-
-

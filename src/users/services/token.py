@@ -13,7 +13,7 @@ class TokenService(object):
     def generate_token(self, seconds, user=None):
         token, expires_at = token_generator(seconds=seconds)
         if user:
-            user.token.create(expires=expires_at, otp=token)
+            user.token.create(expires=expires_at, token=token)
         return token, expires_at
 
     def verify_token(self):
@@ -24,9 +24,9 @@ class TokenService(object):
         expires_at = token_obj.expires_at
         token_new, expires_at = token_generator(expires_at=expires_at)
         if timezone.now() > expires_at:
-            raise serializers.ValidationError(detail={"otp": "Expired Token"})
+            raise serializers.ValidationError(detail={"token": "Expired Token"})
 
         if self.token != token_new:
-            raise serializers.ValidationError(detail={"otp": "Expired Token"})
+            raise serializers.ValidationError(detail={"token": "Expired Token"})
         else:
             return token_obj
