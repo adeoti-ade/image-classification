@@ -132,8 +132,3 @@ resources/
 
 .idea
 .idea/
-
-.env.dev
-.env.stage
-.env.stage.db
-.env.example
