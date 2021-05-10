@@ -21,16 +21,16 @@ class TokenSerializer(serializers.ModelSerializer):
     class Meta:
         model = Token
         fields = ["token"]
+        extra_kwargs = {"token": {"required": True}}
 
-    def validate(self):
-        request = self.context["request"]
-        token = request.data.get("token", None)
-        token_qs = Token.objects.filter(otp=token)
+    def validate(self, data):
+        token = data.get("token", None)
+        token_qs = Token.objects.filter(token=token)
         if not token_qs.exists():
             raise serializers.ValidationError(detail={
                 "otp": "token does not exist"
             })
-        token = token_qs.first()
 
+        return data
 
 
