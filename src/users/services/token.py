@@ -17,12 +17,12 @@ class TokenService(object):
         return token, expires_at
 
     def verify_token(self):
-        token_qs = Token.objects.filter(otp=self.token)
+        token_qs = Token.objects.filter(token=self.token)
         if not token_qs:
             raise serializers.ValidationError(detail={"token": "Invalid Token"})
         token_obj = token_qs.first()
-        expires_at = token_obj.expires_at
-        token_new, expires_at = token_generator(expires_at=expires_at)
+        expires = token_obj.expires
+        token_new, expires_at = token_generator(expires_at=expires)
         if timezone.now() > expires_at:
             raise serializers.ValidationError(detail={"token": "Expired Token"})
 
