@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from users.models import User, Token
-from users.services.token import TokenService
+from .validators import is_valid_mobile
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -34,3 +34,5 @@ class TokenSerializer(serializers.ModelSerializer):
         return data
 
 
+class MobileNumberSerializer(serializers.Serializer):
+    phone_number = serializers.CharField(required=True, validators=[is_valid_mobile])

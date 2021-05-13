@@ -31,6 +31,8 @@ class User(AbstractBaseUser, BaseModel):
     first_name = models.CharField(max_length=150, blank=False, null=False)
     last_name = models.CharField(max_length=150, blank=False, null=False)
     username = models.CharField(max_length=150, blank=False, null=True, unique=True)
+    mobile = models.CharField(max_length=20, blank=False, null=True, unique=True)
+    mobile_verified = models.BooleanField(default=False)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []  # Email & Password are required by default.python manage.py
