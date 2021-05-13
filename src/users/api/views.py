@@ -75,11 +75,12 @@ class UserViewset(viewsets.ModelViewSet):
         mobile_serializer = MobileNumberSerializer(data=request.data)
         user = request.user
         mobile_serializer.is_valid(raise_exception=True)
-        mobile = request.data.get("mobile")
+        mobile = request.data.get("phone_number")
         token_service = TokenService()
         token, expires_at = token_service.generate_token(seconds=3600, user=user)
         print(token)
         user.mobile = mobile
+        user.mobile_verified = False
         user.save()
         return Response()
 
