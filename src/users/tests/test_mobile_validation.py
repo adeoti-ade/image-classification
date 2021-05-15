@@ -16,7 +16,6 @@ class MobileNumberTest(TestCase):
     def test_valid_prefix(self):
         with self.assertRaises(ValidationError):
             is_valid_mobile("01234567891")
-            msg = "mobile must be one of {}".format(",".join(valid_mobile_prefix))
-            # self.assertEqual(msg, )
+            # msg = "mobile must be one of {}".format(",".join(valid_mobile_prefix))
         with self.assertRaises(ValidationError):
             is_valid_mobile("1234567890123")
