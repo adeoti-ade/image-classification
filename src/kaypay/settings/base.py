@@ -27,7 +27,8 @@ DJANGO_APPS = [
 
 KAYPAY_APPS = [
     'users',
-    'utils'
+    'utils',
+    'wallets'
 ]
 
 THIRD_PARTIES = [

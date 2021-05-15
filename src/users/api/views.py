@@ -97,8 +97,6 @@ class UserViewset(viewsets.ModelViewSet):
 
         return Response(UserSerializer(user).data)
 
-
-
     @transaction.atomic
     def perform_create(self, serializer):
         instance = serializer.save()
